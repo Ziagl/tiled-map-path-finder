@@ -1,4 +1,4 @@
-import { CubeCoordinates, Hex, HexOffset, Orientation, defineHex, hexToOffset, offsetToCube } from "honeycomb-grid";
+import { CubeCoordinates, HexOffset, Orientation, defineHex, hexToOffset, offsetToCube } from "honeycomb-grid";
 import { Utils } from "./Utils";
 
 export class PathFinder
