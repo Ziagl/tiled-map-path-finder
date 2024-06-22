@@ -6,6 +6,7 @@ export class Tile extends defineHex({
     origin: 'topLeft',
     offset: -1
 }) {
+    // additional values
     coordinates:CubeCoordinates = {q: 0, r: 0, s:0};
     movementCost:number = 0;
     estimatedMovementCost:number = 0;

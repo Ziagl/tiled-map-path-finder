@@ -2,19 +2,6 @@ import { CubeCoordinates, Direction, Grid, Hex, hexToOffset } from "honeycomb-gr
 import { Tile } from "./Tile";
 
 export class Utils {
-    // normalizes given map
-    public static normalize(map:number[][]) {
-        const flattened = map.flat();
-        const minimum = Math.min(...flattened);
-        const maximum = Math.max(...flattened);
-
-        map.forEach((row) => {
-            row.forEach((value, index) => {
-                row[index] = (value - minimum) / (maximum - minimum);
-            });
-        });
-    }
-
     // get all neighbors of given tile (pointy layout)
     public static neighbors(grid: Grid<Tile>, coordinates: CubeCoordinates) :Tile[] {
         let neighbors:Tile[] = [];
@@ -68,7 +55,6 @@ export class Utils {
 
         // filter out all not walkable neighbors
         allNeighbors.forEach((neighbor) => {
-            console.log(neighbor.coordinates);
             const hex = new Hex([neighbor.coordinates.q, neighbor.coordinates.r]);
             const offset = hexToOffset(hex);
             const cost = map[offset.row]?.[offset.col];

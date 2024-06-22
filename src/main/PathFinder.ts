@@ -9,19 +9,20 @@ export class PathFinder
     //private _map_y:number = 0;
 
     private _grid:Grid<Tile>;
-
-    // TODO one should be able to change that config
-    private _offset:HexOffset = -1;
-    private _orientation:Orientation = Orientation.POINTY;
+    private _hexSetting;
+    private _hexDefinition;
 
     constructor(map:number[], rows:number, columns:number) {
         this._map = Utils.convertTo2DArray(map, rows, columns);
         this._map_x = columns;
         //this._map_y = rows;
 
+        // initilize grid and definition to convert offset -> cube coordinates
         this._grid = new Grid(Tile, rectangle({ width: columns, height: rows }));
+        this._hexSetting = {offset: -1 as HexOffset, orientation: Orientation.POINTY};
+        this._hexDefinition = defineHex(this._hexSetting);
 
-        Utils.normalize(this._map);
+        //Utils.normalize(this._map);
     }
 
     // computes path with lowest costs from start to end
@@ -37,16 +38,80 @@ export class PathFinder
         tile.estimatedMovementCost = this.calculateDistance(start, end);
         openList.push(tile);
 
-        do{
+        // compute AStar algorithm
+        let pathFound = false;
+        do {
             // remove tile from open list
             const tile = openList.pop()!;
             // add it to closed list
             closedList.push(tile);
+            // if tile is end, break
+            console.log("tile: " + tile.coordinates.q + "," + tile.coordinates.r + " end: " + end.q + "," + end.r);
+            if(tile.coordinates.q == end.q && tile.coordinates.r == end.r) {
+                pathFound = true;
+                break;
+            }
             // get neighbors walkable neighbors
+            let neighbors = Utils.neighbors(this._grid, tile.coordinates);
+            let walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map);
+            // for every walkable neighbor
+            walkableNeighbors.forEach(neighbor => {
+                // if neighbor is in closed list, skip it
+                if(closedList.find(t => t.coordinates.q == neighbor.coordinates.q && t.coordinates.r == neighbor.coordinates.r) != undefined) {
+                    return;
+                }
+                // if neighbor is not in open list, add it
+                if(openList.find(t => t.coordinates.q == neighbor.coordinates.q && t.coordinates.r == neighbor.coordinates.r) == undefined) {
+                    const tileMovementCost = this.movementCosts(neighbor.coordinates);
+                    neighbor.movementCost = tile.movementCost + tileMovementCost;
+                    neighbor.estimatedMovementCost = this.calculateDistance(neighbor.coordinates, end);
+                    neighbor.sum = neighbor.movementCost + neighbor.estimatedMovementCost;
+                    openList.unshift(neighbor);
+                }
+                // if neighbor is in open list and has a lower cost, update it
+                else {
+                    let existing = openList.find(t => t.coordinates.q == neighbor.coordinates.q && t.coordinates.r == neighbor.coordinates.r);
+                    const tileMovementCost = this.movementCosts(neighbor.coordinates);
+                    if(existing != undefined && existing.movementCost > tile.movementCost + tileMovementCost) {
+                        const tileMovementCost = this.movementCosts(neighbor.coordinates);
+                        existing.movementCost = tile.movementCost + tileMovementCost;
+                        existing.estimatedMovementCost = this.calculateDistance(neighbor.coordinates, end);
+                        existing.sum = existing.movementCost + existing.estimatedMovementCost;
+                    }
+                }
+            });
+        } while(openList.length > 0 && pathFound == false);
+        console.log("pathFound: " + pathFound);
+        console.log("closedList: " + closedList.length + " openList: " + openList.length);
 
-        }while(openList.length > 0);
-
-        // TODO implement path finding
+        // reconstruct path
+        if(pathFound == true) {
+            let current = closedList.pop();
+            while(current != undefined) {
+                // add end coordinates
+                path.push(current.coordinates);
+                // if start is reached end loop
+                console.log("tile: " + current.coordinates.q + "," + current.coordinates.r + " start: " + start.q + "," + start.r + " pathCount: " + path.length);
+                if(current.coordinates.q == start.q && current.coordinates.r == start.r) {
+                    // stop if start is reached
+                    current = undefined;
+                } else {
+                    const neighbors = Utils.neighbors(this._grid, current.coordinates);
+                    const walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map);
+                    console.log("walkableNeighbors: " + walkableNeighbors.length);
+                    for (const neighbor of walkableNeighbors) {
+                        console.log("tile: " + current.coordinates.q + "," + current.coordinates.r + " neighbor: " + neighbor.coordinates.q + "," + neighbor.coordinates.r)
+                        const nextTile = closedList.find(t => t.coordinates.q == neighbor.coordinates.q && t.coordinates.r == neighbor.coordinates.r);
+                        if(nextTile != undefined) {
+                            if(neighbor.movementCost < current?.movementCost!) {
+                                current = nextTile;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         return path;
     }
@@ -54,20 +119,18 @@ export class PathFinder
     // additional computePath method for offset coordinates
     public computePathOffsetCoordinates(start:{x:number, y:number}, end:{x:number, y:number}):{x:number, y:number}[] {
         let path:{x:number, y:number}[] = [];
-        
+
         // convert offset coordinates to cube coordinates
-        const hexSetting = {offset: this._offset, orientation: this._orientation};
-        const startCube = offsetToCube(hexSetting, {col: start.x, row: start.y});
-        const endCube = offsetToCube(hexSetting, {col: end.x, row: end.y});
+        const startCube = offsetToCube(this._hexSetting, {col: start.x, row: start.y});
+        const endCube = offsetToCube(this._hexSetting, {col: end.x, row: end.y});
 
         // compute path
         const computedPath = this.computePath(startCube, endCube);
 
         // convert resultin path back to offset coordinates
-        if(path.length > 0) {
-            const Hex = defineHex(hexSetting);
+        if(computedPath.length > 0) {
             computedPath.forEach(coord => {
-                const hex = new Hex([coord.q, coord.r]);
+                const hex = new this._hexDefinition([coord.q, coord.r]);
                 const offset = hexToOffset(hex);
                 path.push({x:offset.row, y:offset.col});
             });
@@ -98,5 +161,12 @@ export class PathFinder
     private calculateDistance(start:CubeCoordinates, end:CubeCoordinates):number {
         const lineBetween = line<Tile>({ start: [start.q, start.r], stop: [end.q, end.r] });
         return this._grid.traverse(lineBetween).size;
+    }
+
+    // get movement costs for a given tile
+    private movementCosts(coordinates:CubeCoordinates):number {
+        const hex = new this._hexDefinition([coordinates.q, coordinates.r]);
+        const offset = hexToOffset(hex);
+        return this._map[offset.row]?.[offset.col]!;
     }
 };
