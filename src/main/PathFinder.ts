@@ -21,8 +21,6 @@ export class PathFinder
         this._grid = new Grid(Tile, rectangle({ width: columns, height: rows }));
         this._hexSetting = {offset: -1 as HexOffset, orientation: Orientation.POINTY};
         this._hexDefinition = defineHex(this._hexSetting);
-
-        //Utils.normalize(this._map);
     }
 
     // computes path with lowest costs from start to end
@@ -46,7 +44,6 @@ export class PathFinder
             // add it to closed list
             closedList.push(tile);
             // if tile is end, break
-            console.log("tile: " + tile.coordinates.q + "," + tile.coordinates.r + " end: " + end.q + "," + end.r);
             if(tile.coordinates.q == end.q && tile.coordinates.r == end.r) {
                 pathFound = true;
                 break;
@@ -81,8 +78,6 @@ export class PathFinder
                 }
             });
         } while(openList.length > 0 && pathFound == false);
-        console.log("pathFound: " + pathFound);
-        console.log("closedList: " + closedList.length + " openList: " + openList.length);
 
         // reconstruct path
         if(pathFound == true) {
@@ -91,16 +86,13 @@ export class PathFinder
                 // add end coordinates
                 path.push(current.coordinates);
                 // if start is reached end loop
-                console.log("tile: " + current.coordinates.q + "," + current.coordinates.r + " start: " + start.q + "," + start.r + " pathCount: " + path.length);
                 if(current.coordinates.q == start.q && current.coordinates.r == start.r) {
                     // stop if start is reached
                     current = undefined;
                 } else {
                     const neighbors = Utils.neighbors(this._grid, current.coordinates);
                     const walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map);
-                    console.log("walkableNeighbors: " + walkableNeighbors.length);
                     for (const neighbor of walkableNeighbors) {
-                        console.log("tile: " + current.coordinates.q + "," + current.coordinates.r + " neighbor: " + neighbor.coordinates.q + "," + neighbor.coordinates.r)
                         const nextTile = closedList.find(t => t.coordinates.q == neighbor.coordinates.q && t.coordinates.r == neighbor.coordinates.r);
                         if(nextTile != undefined) {
                             if(neighbor.movementCost < current?.movementCost!) {

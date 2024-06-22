@@ -18,7 +18,6 @@ test('findPath', () => {
     expect(path.length).toBe(7);
 });
 test('findComplexPath', () => {
-    console.log("findComplexPath");
     const exampleMap:number [] = [
         1, 1, 2, 3,
         1, 2, 1, 3,
@@ -26,7 +25,17 @@ test('findComplexPath', () => {
         3, 1, 2, 1
     ];
     const pf = new PathFinder(exampleMap, 4, 4);
-    console.log(pf.print());
     const path = pf.computePathOffsetCoordinates({x:0,y:0}, {x:3,y:3});
     expect(path.length).toBe(6);
+});
+test('noPossiblePath', () => {
+    const exampleMap:number [] = [
+        1, 1, 2, 1,
+        1, 2, 3, 3,
+        2, 2, 8, 0,
+        1, 1, 0, 1
+    ];
+    const pf = new PathFinder(exampleMap, 4, 4);
+    const path = pf.computePathOffsetCoordinates({x:0,y:0}, {x:3,y:3});
+    expect(path.length).toBe(0);
 });
