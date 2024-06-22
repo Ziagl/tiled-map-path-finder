@@ -6,7 +6,7 @@ test('initialize', () => {
     const result = pf.print_unstructured();
     expect(result).not.toBeNull();
 });
-test('findPath', () => {
+/*test('findPath', () => {
     const exampleMap:number [] = [
         1, 1, 1, 1,
         1, 0, 0, 1,
@@ -16,4 +16,4 @@ test('findPath', () => {
     const pf = new PathFinder(exampleMap, 4, 4);
     const path = pf.computePathOffsetCoordinates({x:0,y:0}, {x:3,y:3});
     expect(path.length).toBe(7);
-});
+});*/

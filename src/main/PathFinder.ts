@@ -1,5 +1,6 @@
-import { CubeCoordinates, HexOffset, Orientation, defineHex, hexToOffset, offsetToCube } from "honeycomb-grid";
-import { Utils } from "./Utils";
+import { CubeCoordinates, Grid, HexOffset, Orientation, defineHex, hexToOffset, line, offsetToCube, rectangle } from "honeycomb-grid";
+import { Utils } from "./models/Utils";
+import { Tile } from "./models/Tile";
 
 export class PathFinder
 {
@@ -7,14 +8,18 @@ export class PathFinder
     private _map_x:number = 0;
     //private _map_y:number = 0;
 
+    private _grid:Grid<Tile>;
+
     // TODO one should be able to change that config
     private _offset:HexOffset = -1;
     private _orientation:Orientation = Orientation.POINTY;
 
-    public initialize(map:number[], rows:number, columns:number) {
-        this._map = this.convertTo2DArray(map, rows, columns);
+    constructor(map:number[], rows:number, columns:number) {
+        this._map = Utils.convertTo2DArray(map, rows, columns);
         this._map_x = columns;
         //this._map_y = rows;
+
+        this._grid = new Grid(Tile, rectangle({ width: columns, height: rows }));
 
         Utils.normalize(this._map);
     }
@@ -22,6 +27,24 @@ export class PathFinder
     // computes path with lowest costs from start to end
     public computePath(start:CubeCoordinates, end:CubeCoordinates):CubeCoordinates[] {
         let path:CubeCoordinates[] = [];
+
+        // initialize AStar
+        let openList:Tile[] = [];
+        let closedList:Tile[] = [];
+        let tile = new Tile();
+        tile.coordinates = start;
+        tile.movementCost = 0;
+        tile.estimatedMovementCost = this.calculateDistance(start, end);
+        openList.push(tile);
+
+        do{
+            // remove tile from open list
+            const tile = openList.pop()!;
+            // add it to closed list
+            closedList.push(tile);
+            // get neighbors walkable neighbors
+
+        }while(openList.length > 0);
 
         // TODO implement path finding
 
@@ -35,7 +58,7 @@ export class PathFinder
         // convert offset coordinates to cube coordinates
         const hexSetting = {offset: this._offset, orientation: this._orientation};
         const startCube = offsetToCube(hexSetting, {col: start.x, row: start.y});
-        const endCube = offsetToCube(hexSetting, {col: end.x, row: end.y})
+        const endCube = offsetToCube(hexSetting, {col: end.x, row: end.y});
 
         // compute path
         const computedPath = this.computePath(startCube, endCube);
@@ -71,11 +94,9 @@ export class PathFinder
         return this._map.flat().join(" ");
     }
 
-    private convertTo2DArray(map: number[], rows: number, cols: number): number[][] {
-        const twoDArray: number[][] = [];
-        for (let i = 0; i < rows; i++) {
-            twoDArray[i] = map.slice(i * cols, (i + 1) * cols);
-        }
-        return twoDArray;
+    // calculates Manhattan distance
+    private calculateDistance(start:CubeCoordinates, end:CubeCoordinates):number {
+        const lineBetween = line<Tile>({ start: [start.q, start.r], stop: [end.q, end.r] });
+        return this._grid.traverse(lineBetween).size;
     }
 };

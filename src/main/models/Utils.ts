@@ -1,4 +1,4 @@
-import { Direction, Grid, Hex, hexToOffset } from "honeycomb-grid";
+import { CubeCoordinates, Direction, Grid, Hex, hexToOffset } from "honeycomb-grid";
 import { Tile } from "./Tile";
 
 export class Utils {
@@ -15,37 +15,49 @@ export class Utils {
         });
     }
 
-    // get all neighbors of given tile
-    public static neighbors(grid: Grid<Tile>, coordinates: [q: number, r: number]) :Tile[] {
+    // get all neighbors of given tile (pointy layout)
+    public static neighbors(grid: Grid<Tile>, coordinates: CubeCoordinates) :Tile[] {
         let neighbors:Tile[] = [];
+        const directions:Direction[] = [Direction.NE, Direction.E, Direction.SE, Direction.SW, Direction.W, Direction.NW];
 
-        /* not used for pointy orientation
-        if(grid.neighborOf(coordinates, Direction.N, { allowOutside: false }) !== undefined) {
-            neighbors.push(grid.neighborOf(coordinates, Direction.N));
-        }
-        */
-        if(grid.neighborOf(coordinates, Direction.NE, { allowOutside: false }) !== undefined) {
-            neighbors.push(grid.neighborOf(coordinates, Direction.NE));
-        }
-        if(grid.neighborOf(coordinates, Direction.E, { allowOutside: false }) != undefined) {
-           neighbors.push(grid.neighborOf(coordinates, Direction.E)); 
-        }
-        if(grid.neighborOf(coordinates, Direction.SE, { allowOutside: false }) != undefined) {
-            neighbors.push(grid.neighborOf(coordinates, Direction.SE));
-        }
-        /* not used for pointy orientation
-        if(grid.neighborOf(coordinates, Direction.S, { allowOutside: false }) != undefined) {
-            neighbors.push(grid.neighborOf(coordinates, Direction.S));
-        }*/
-        if(grid.neighborOf(coordinates, Direction.SW, { allowOutside: false }) != undefined) {
-            neighbors.push(grid.neighborOf(coordinates, Direction.SW));
-        }
-        if(grid.neighborOf(coordinates, Direction.W, { allowOutside: false }) != undefined) {
-            neighbors.push(grid.neighborOf(coordinates, Direction.W));
-        }
-        if(grid.neighborOf(coordinates, Direction.NW, { allowOutside: false }) != undefined) {
-            neighbors.push(grid.neighborOf(coordinates, Direction.NW));
-        }
+        directions.forEach(direction => {
+            if(grid.neighborOf(coordinates, direction, { allowOutside: false }) !== undefined) {
+                let tile = grid.neighborOf(coordinates, direction);
+                switch(direction) {
+                    case Direction.NE: tile.coordinates = {
+                        q: coordinates.q + 1, 
+                        r: coordinates.r - 1,
+                        s: coordinates.s,
+                    }; break;
+                    case Direction.E: tile.coordinates = {
+                        q: coordinates.q + 1, 
+                        r: coordinates.r,
+                        s: coordinates.s - 1,
+                    }; break;
+                    case Direction.SE:  tile.coordinates = {
+                        q: coordinates.q, 
+                        r: coordinates.r + 1,
+                        s: coordinates.s - 1,
+                    };break;
+                    case Direction.SW: tile.coordinates = {
+                        q: coordinates.q - 1, 
+                        r: coordinates.r + 1,
+                        s: coordinates.s,
+                    }; break;
+                    case Direction.W: tile.coordinates = {
+                        q: coordinates.q - 1, 
+                        r: coordinates.r,
+                        s: coordinates.s + 1,
+                    }; break;
+                    case Direction.NW: tile.coordinates = {
+                        q: coordinates.q, 
+                        r: coordinates.r - 1,
+                        s: coordinates.s - 1,
+                    }; break;
+                }
+                neighbors.push(tile);
+            }
+        });
 
         return neighbors;
     }
@@ -56,13 +68,24 @@ export class Utils {
 
         // filter out all not walkable neighbors
         allNeighbors.forEach((neighbor) => {
+            console.log(neighbor.coordinates);
             const hex = new Hex([neighbor.coordinates.q, neighbor.coordinates.r]);
             const offset = hexToOffset(hex);
-            if((map[offset.row]?.[offset.col] as number) > 0) {
+            const cost = map[offset.row]?.[offset.col];
+            if(cost != undefined && cost > 0) {
                 neighbors.push(neighbor);
             }
         });
 
         return neighbors;
+    }
+
+    // converts a 1d array of numbers to a 2d array of numbers
+    public static convertTo2DArray(map: number[], rows: number, cols: number): number[][] {
+        const twoDArray: number[][] = [];
+        for (let i = 0; i < rows; i++) {
+            twoDArray[i] = map.slice(i * cols, (i + 1) * cols);
+        }
+        return twoDArray;
     }
 }
