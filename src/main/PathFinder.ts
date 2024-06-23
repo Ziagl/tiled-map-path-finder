@@ -6,7 +6,6 @@ export class PathFinder
 {
     private _map:number[][] = [];
     private _map_x:number = 0;
-    //private _map_y:number = 0;
 
     private _grid:Grid<Tile>;
     private _hexSetting;
@@ -15,7 +14,6 @@ export class PathFinder
     constructor(map:number[], rows:number, columns:number) {
         this._map = Utils.convertTo2DArray(map, rows, columns);
         this._map_x = columns;
-        //this._map_y = rows;
 
         // initilize grid and definition to convert offset -> cube coordinates
         this._grid = new Grid(Tile, rectangle({ width: columns, height: rows }));
