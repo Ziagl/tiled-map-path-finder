@@ -131,6 +131,61 @@ export class PathFinder
         return path; 
     }
 
+    // returns all tiles that are in range
+    public reachableTiles(start:CubeCoordinates, maxcost:number):CubeCoordinates[] {
+        let reachableTiles:CubeCoordinates[] = [];
+
+        // initialize
+        let openList:Tile[] = [];
+        let closedList:Tile[] = [];
+        let tile = new Tile();
+        tile.coordinates = start;
+        tile.movementCost = 0;
+        openList.push(tile);
+
+        // compute
+        do {
+            // remove tile from open list
+            const tile = openList.pop()!;
+            // add it to closed list
+            closedList.push(tile);
+            // get neighbors walkable neighbors
+            let neighbors = Utils.neighbors(this._grid, tile.coordinates);
+            let walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map);
+            // for every walkable neighbor
+            walkableNeighbors.forEach(neighbor => {
+                // if neighbor is in closed list, skip it
+                if(closedList.find(t => t.coordinates.q == neighbor.coordinates.q && t.coordinates.r == neighbor.coordinates.r) != undefined) {
+                    return;
+                }
+                // if neighbor is not in open list, add it
+                if(openList.find(t => t.coordinates.q == neighbor.coordinates.q && t.coordinates.r == neighbor.coordinates.r) == undefined) {
+                    const tileMovementCost = this.movementCosts(neighbor.coordinates);
+                    neighbor.movementCost = tile.movementCost + tileMovementCost;
+                    if(neighbor.movementCost <= maxcost) {
+                        openList.unshift(neighbor);
+                    }
+                }
+                // if neighbor is in open list and has a lower cost, update it
+                else {
+                    let existing = openList.find(t => t.coordinates.q == neighbor.coordinates.q && t.coordinates.r == neighbor.coordinates.r);
+                    const tileMovementCost = this.movementCosts(neighbor.coordinates);
+                    if(existing != undefined && existing.movementCost > tile.movementCost + tileMovementCost) {
+                        const tileMovementCost = this.movementCosts(neighbor.coordinates);
+                        existing.movementCost = tile.movementCost + tileMovementCost;
+                    }
+                }
+            });
+        } while(openList.length > 0);
+
+        // fill reachable tiles
+        closedList.forEach(tile => {
+            reachableTiles.push(tile.coordinates);
+        });
+
+        return reachableTiles;
+    }
+
     // print map structured (one row as one line)
     public print() :string {
         let response: string = "";

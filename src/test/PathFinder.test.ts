@@ -39,3 +39,25 @@ test('noPossiblePath', () => {
     const path = pf.computePathOffsetCoordinates({x:0,y:0}, {x:3,y:3});
     expect(path.length).toBe(0);
 });
+test('reachableTiles', () => {
+    const exampleMap:number [] = [
+        1, 1, 2, 3,
+        1, 2, 1, 3,
+        2, 4, 8, 1,
+        3, 1, 2, 1
+    ];
+    const pf = new PathFinder(exampleMap, 4, 4);
+    const reachableTiles = pf.reachableTiles({q:0, r:0, s:0}, 3);
+    expect(reachableTiles.length).toBe(6);
+});
+test('reachableTiles2', () => {
+    const exampleMap:number [] = [
+        8, 8, 8, 3,
+        8, 1, 1, 4,
+        8, 8, 1, 1,
+        3, 9, 1, 2
+    ];
+    const pf = new PathFinder(exampleMap, 4, 4);
+    const reachableTiles = pf.reachableTiles({q:1, r:1, s:-2}, 3);
+    expect(reachableTiles.length).toBe(5);
+});
