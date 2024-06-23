@@ -105,7 +105,7 @@ export class PathFinder
             }
         }
 
-        return path;
+        return path.reverse();
     }
 
     // additional computePath method for offset coordinates
