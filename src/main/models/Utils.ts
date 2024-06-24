@@ -39,7 +39,7 @@ export class Utils {
                     case Direction.NW: tile.coordinates = {
                         q: coordinates.q, 
                         r: coordinates.r - 1,
-                        s: coordinates.s - 1,
+                        s: coordinates.s + 1,
                     }; break;
                 }
                 neighbors.push(tile);
