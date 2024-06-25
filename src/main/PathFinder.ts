@@ -159,8 +159,11 @@ export class PathFinder
                 // if neighbor is not in open list, add it
                 if(openList.find(t => t.coordinates.q == neighbor.coordinates.q && t.coordinates.r == neighbor.coordinates.r) == undefined) {
                     const tileMovementCost = this.movementCosts(neighbor.coordinates);
+                    // check if movement cost before change is ok to access the tile
+                    // if next tile would cost 2 and you only have 1 left, you can still move to that tile.
+                    const costOk = neighbor.movementCost <= maxcost;
                     neighbor.movementCost = tile.movementCost + tileMovementCost;
-                    if(neighbor.movementCost <= maxcost) {
+                    if(costOk) {
                         openList.unshift(neighbor);
                     }
                 }
@@ -212,6 +215,6 @@ export class PathFinder
     private movementCosts(coordinates:CubeCoordinates):number {
         const hex = new this._hexDefinition([coordinates.q, coordinates.r]);
         const offset = hexToOffset(hex);
-        return this._map[offset.row]?.[offset.col]!;
+        return this._map[offset.col]?.[offset.row]!;
     }
 };
