@@ -159,12 +159,15 @@ export class PathFinder
                 // if neighbor is not in open list, add it
                 if(openList.find(t => t.coordinates.q == neighbor.coordinates.q && t.coordinates.r == neighbor.coordinates.r) == undefined) {
                     const tileMovementCost = this.movementCosts(neighbor.coordinates);
-                    // check if movement cost before change is ok to access the tile
-                    // if next tile would cost 2 and you only have 1 left, you can still move to that tile.
-                    const costOk = neighbor.movementCost <= maxcost;
-                    neighbor.movementCost = tile.movementCost + tileMovementCost;
-                    if(costOk) {
-                        openList.unshift(neighbor);
+                    // 0 means not walkable so stop here
+                    if(tileMovementCost > 0) {
+                        // check if movement cost before change is ok to access the tile
+                        // if next tile would cost 2 and you only have 1 left, you can still move to that tile.
+                        const costOk = tile.movementCost <= maxcost;
+                        neighbor.movementCost = tile.movementCost + tileMovementCost;
+                        if(costOk) {
+                            openList.unshift(neighbor);
+                        }
                     }
                 }
                 // if neighbor is in open list and has a lower cost, update it
