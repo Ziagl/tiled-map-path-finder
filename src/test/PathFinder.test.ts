@@ -47,8 +47,8 @@ test('reachableTiles', () => {
         3, 1, 2, 1
     ];
     const pf = new PathFinder(exampleMap, 4, 4);
-    const reachableTiles = pf.reachableTiles({q:0, r:0, s:0}, 3);
-    expect(reachableTiles.length).toBe(6);
+    const reachableTiles = pf.reachableTiles({q:0, r:0, s:0}, 2);
+    expect(reachableTiles.length).toBe(7);
 });
 test('reachableTiles2', () => {
     const exampleMap:number [] = [
@@ -58,6 +58,6 @@ test('reachableTiles2', () => {
         3, 9, 1, 2
     ];
     const pf = new PathFinder(exampleMap, 4, 4);
-    const reachableTiles = pf.reachableTiles({q:1, r:1, s:-2}, 3);
-    expect(reachableTiles.length).toBe(5);
+    const reachableTiles = pf.reachableTiles({q:1, r:1, s:-2}, 2);
+    expect(reachableTiles.length).toBe(12);
 });

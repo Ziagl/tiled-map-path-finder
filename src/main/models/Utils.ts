@@ -55,11 +55,9 @@ export class Utils {
 
         // filter out all not walkable neighbors
         allNeighbors.forEach((neighbor) => {
-            console.log("walkableNeighbors q:"+neighbor.coordinates.q+" r:"+neighbor.coordinates.r+" s:"+neighbor.coordinates.s);
             const hex = new Hex([neighbor.coordinates.q, neighbor.coordinates.r]);
             const offset = hexToOffset(hex);
-            const cost = map[offset.col]?.[offset.row];
-            console.log("offset x: "+offset.col+" y: "+offset.row+" cost:"+cost);
+            const cost = map[offset.row]?.[offset.col];
             if(cost != undefined && cost > 0) {
                 neighbors.push(neighbor);
             }
@@ -74,8 +72,6 @@ export class Utils {
         for (let i = 0; i < rows; i++) {
             twoDArray[i] = map.slice(i * cols, (i + 1) * cols);
         }
-        console.log("convertTo2DArray: ");
-        console.log(twoDArray);
         return twoDArray;
     }
 }

@@ -159,24 +159,9 @@ export class PathFinder
                 // if neighbor is not in open list, add it
                 if(openList.find(t => t.coordinates.q == neighbor.coordinates.q && t.coordinates.r == neighbor.coordinates.r) == undefined) {
                     const tileMovementCost = this.movementCosts(neighbor.coordinates);
-                    // 0 means not walkable so stop here
-                    if(tileMovementCost > 0) {
-                        // check if movement cost before change is ok to access the tile
-                        // if next tile would cost 2 and you only have 1 left, you can still move to that tile.
-                        const costOk = tile.movementCost <= maxcost;
-                        neighbor.movementCost = tile.movementCost + tileMovementCost;
-                        if(costOk) {
-                            openList.unshift(neighbor);
-                        }
-                    }
-                }
-                // if neighbor is in open list and has a lower cost, update it
-                else {
-                    let existing = openList.find(t => t.coordinates.q == neighbor.coordinates.q && t.coordinates.r == neighbor.coordinates.r);
-                    const tileMovementCost = this.movementCosts(neighbor.coordinates);
-                    if(existing != undefined && existing.movementCost > tile.movementCost + tileMovementCost) {
-                        const tileMovementCost = this.movementCosts(neighbor.coordinates);
-                        existing.movementCost = tile.movementCost + tileMovementCost;
+                    neighbor.movementCost = tile.movementCost + tileMovementCost;
+                    if(tile.movementCost < maxcost) {
+                        openList.unshift(neighbor);
                     }
                 }
             });
@@ -218,6 +203,6 @@ export class PathFinder
     private movementCosts(coordinates:CubeCoordinates):number {
         const hex = new this._hexDefinition([coordinates.q, coordinates.r]);
         const offset = hexToOffset(hex);
-        return this._map[offset.col]?.[offset.row]!;
+        return this._map[offset.row]?.[offset.col]!;
     }
 };
