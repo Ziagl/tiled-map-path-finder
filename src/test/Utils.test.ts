@@ -33,3 +33,14 @@ test('walkableNeighbors', () => {
     walkableNeighbors = Utils.walkableNeighbors(neighbors, pf['_map']);
     expect(walkableNeighbors.length).toBe(3);
 });
+test('shuffle', () => {
+    const originalArray = [1, 2, 3, 4, 5];
+    const shuffledArray = [...originalArray]; // Create a copy to compare later
+    Utils.shuffle(shuffledArray);
+
+    // Check if the shuffled array has the same elements as the original
+    expect(shuffledArray).toHaveLength(originalArray.length);
+    originalArray.forEach((item) => {
+      expect(shuffledArray).toContain(item);
+    });
+});

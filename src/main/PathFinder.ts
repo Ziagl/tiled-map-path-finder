@@ -93,12 +93,12 @@ export class PathFinder
                 } else {
                     const neighbors = Utils.neighbors(this._grid, current.coordinates);
                     const walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map);
+                    Utils.shuffle(walkableNeighbors);
                     for (const neighbor of walkableNeighbors) {
                         const nextTile = closedList.find(t => t.coordinates.q == neighbor.coordinates.q && t.coordinates.r == neighbor.coordinates.r);
                         if(nextTile != undefined) {
                             if(neighbor.movementCost < current?.movementCost!) {
                                 current = nextTile;
-                                break;
                             }
                         }
                     }
