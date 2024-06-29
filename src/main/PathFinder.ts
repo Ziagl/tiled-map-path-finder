@@ -5,24 +5,27 @@ import { Tile } from "./models/Tile";
 export class PathFinder
 {
     private _map:number[][] = [];
-    private _map_x:number = 0;
-
+    private _map_columns:number = 0;
+    private _map_rows:number = 0;
     private _grid:Grid<Tile>;
     private _hexSetting;
     private _hexDefinition;
 
     constructor(map:number[], rows:number, columns:number) {
         this._map = Utils.convertTo2DArray(map, rows, columns);
-        this._map_x = columns;
+        this._map_columns = columns;
+        this._map_rows = rows;
 
         // initilize grid and definition to convert offset -> cube coordinates
-        this._grid = new Grid(Tile, rectangle({ width: columns, height: rows }));
+        this._grid = new Grid(Tile, rectangle({ width: this._map_columns, height: this._map_rows }));
         this._hexSetting = {offset: -1 as HexOffset, orientation: Orientation.POINTY};
         this._hexDefinition = defineHex(this._hexSetting);
     }
 
     // computes path with lowest costs from start to end
     public computePath(start:CubeCoordinates, end:CubeCoordinates):CubeCoordinates[] {
+        // initilize grid
+        this._grid = new Grid(Tile, rectangle({ width: this._map_columns, height: this._map_rows }));
         let path:CubeCoordinates[] = [];
 
         // initialize AStar
@@ -131,6 +134,8 @@ export class PathFinder
 
     // returns all tiles that are in range
     public reachableTiles(start:CubeCoordinates, maxcost:number):CubeCoordinates[] {
+        // initilize grid
+        this._grid = new Grid(Tile, rectangle({ width: this._map_columns, height: this._map_rows }));
         let reachableTiles:CubeCoordinates[] = [];
 
         // initialize
@@ -178,10 +183,10 @@ export class PathFinder
     // print map structured (one row as one line)
     public print() :string {
         let response: string = "";
-        for (let i=0; i < this._map_x; ++i) {
+        for (let i=0; i < this._map_columns; ++i) {
             const row = this._map[i];
             response += (row?.join(' '));
-            if(i < this._map_x - 1) {
+            if(i < this._map_columns - 1) {
                 response += '\n';
             }
         }
