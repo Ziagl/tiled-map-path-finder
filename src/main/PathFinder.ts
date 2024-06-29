@@ -4,6 +4,7 @@ import { Tile } from "./models/Tile";
 
 export class PathFinder
 {
+    private readonly MAXLOOPS = 10000;
     private _map:number[][] = [];
     private _map_columns:number = 0;
     private _map_rows:number = 0;
@@ -39,6 +40,7 @@ export class PathFinder
 
         // compute AStar algorithm
         let pathFound = false;
+        let loopMax = this.MAXLOOPS;
         do {
             // remove tile from open list
             const tile = openList.pop()!;
@@ -49,6 +51,12 @@ export class PathFinder
                 pathFound = true;
                 break;
             }
+            // if start tile is not passable, break
+            if(this.movementCosts(tile.coordinates) == 0){
+                pathFound = false;
+                break;
+            }
+
             // get neighbors walkable neighbors
             let neighbors = Utils.neighbors(this._grid, tile.coordinates);
             let walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map);
@@ -78,12 +86,14 @@ export class PathFinder
                     }
                 }
             });
-        } while(openList.length > 0 && pathFound == false);
+            --loopMax;
+        } while(openList.length > 0 && pathFound == false && loopMax > 0);
 
         // reconstruct path
         if(pathFound == true) {
             let current = closedList.pop();
-            while(current != undefined) {
+            loopMax = this.MAXLOOPS;
+            while(current != undefined && loopMax > 0) {
                 // add end coordinates
                 path.push(current.coordinates);
                 // if start is reached end loop
@@ -103,6 +113,7 @@ export class PathFinder
                         }
                     }
                 }
+                --loopMax;
             }
         }
 
@@ -147,11 +158,16 @@ export class PathFinder
         openList.push(tile);
 
         // compute
+        let loopMax = this.MAXLOOPS;
         do {
             // remove tile from open list
             const tile = openList.pop()!;
             // add it to closed list
             closedList.push(tile);
+            // if start tile is not passable, break
+            if(this.movementCosts(tile.coordinates) == 0){
+                break;
+            }
             // get neighbors walkable neighbors
             let neighbors = Utils.neighbors(this._grid, tile.coordinates);
             let walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map);
@@ -170,7 +186,8 @@ export class PathFinder
                     }
                 }
             });
-        } while(openList.length > 0);
+            --loopMax;
+        } while(openList.length > 0 && loopMax > 0);
 
         // fill reachable tiles
         closedList.forEach(tile => {
