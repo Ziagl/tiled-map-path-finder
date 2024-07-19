@@ -2,7 +2,8 @@ import { PathFinder } from "../main";
 import { Utils } from "../main/models/Utils";
 
 test('neighbors', () => {
-    const exampleMap:number [] = Array(16).fill(0);      
+    const exampleMap:number [][] = [];
+    exampleMap[0] = Array(16).fill(0);      
     const pf = new PathFinder(exampleMap, 4, 4);
     // a hex field has normally 6 neighbors
     let neighbors = Utils.neighbors(pf['_grid'], {q:1, r:1, s:-2});
@@ -15,22 +16,22 @@ test('neighbors', () => {
     expect(neighbors.length).toBe(4);
 });
 test('walkableNeighbors', () => {
-    let exampleMap:number [] = [
+    let exampleMap:number [][] = [[
         2, 1, 1, 2,
         1, 0, 0, 1,
         2, 0, 0, 1,
         1, 1, 1, 1,
-    ];
+    ]];
     const pf = new PathFinder(exampleMap, 4, 4);
     // test a tile in the middle
     let neighbors = Utils.neighbors(pf['_grid'], {q:1, r:1, s:-2});
     expect(neighbors.length).toBe(6);
-    let walkableNeighbors = Utils.walkableNeighbors(neighbors, pf['_map']);
+    let walkableNeighbors = Utils.walkableNeighbors(neighbors, pf['_map'][0]!);
     expect(walkableNeighbors.length).toBe(3);
     // check border
     neighbors = Utils.neighbors(pf['_grid'], {q:1, r:0, s:-1});
     expect(neighbors.length).toBe(4);
-    walkableNeighbors = Utils.walkableNeighbors(neighbors, pf['_map']);
+    walkableNeighbors = Utils.walkableNeighbors(neighbors, pf['_map'][0]!);
     expect(walkableNeighbors.length).toBe(3);
 });
 test('shuffle', () => {

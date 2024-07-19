@@ -1,6 +1,6 @@
 {
   "name": "@ziagl/tiled-map-path-finder",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A path finder library for 2 dimensional maps.",
   "author": "Werner Ziegelwanger (ziagl)",
   "license": "GNU LESSER GENERAL PUBLIC LICENSE",
