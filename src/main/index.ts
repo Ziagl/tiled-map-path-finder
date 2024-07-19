@@ -1,1 +1,1 @@
-export { PathFinder } from "./PathFinder"
+export { PathFinder } from './PathFinder';

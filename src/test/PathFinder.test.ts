@@ -1,92 +1,56 @@
-import { PathFinder } from "../main/PathFinder";
+import { PathFinder } from '../main/PathFinder';
 
 test('initialize', () => {
-    const exampleMap:number [][] = [];
-    exampleMap[0] = Array(16).fill(0);
-    const pf = new PathFinder(exampleMap, 4, 4);
-    const result = pf.print_unstructured();
-    expect(result).not.toBeNull();
+  const exampleMap: number[][] = [];
+  exampleMap[0] = Array(16).fill(0);
+  const pf = new PathFinder(exampleMap, 4, 4);
+  const result = pf.print_unstructured();
+  expect(result).not.toBeNull();
 });
 test('findPath', () => {
-    const exampleMap:number [][] = [[
-        1, 1, 1, 1,
-        1, 0, 0, 1,
-        1, 0, 0, 1,
-        1, 1, 1, 1
-    ]];
-    const pf = new PathFinder(exampleMap, 4, 4);
-    const path = pf.computePathOffsetCoordinates({x:0,y:0}, {x:3,y:3}, 0);
-    expect(path.length).toBe(7);
+  const exampleMap: number[][] = [[1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1]];
+  const pf = new PathFinder(exampleMap, 4, 4);
+  const path = pf.computePathOffsetCoordinates({ x: 0, y: 0 }, { x: 3, y: 3 }, 0);
+  expect(path.length).toBe(7);
 });
 test('findComplexPath', () => {
-    const exampleMap:number [][] = [[
-        1, 1, 2, 3,
-        1, 2, 1, 3,
-        2, 4, 8, 1,
-        3, 1, 2, 1
-    ]];
-    const pf = new PathFinder(exampleMap, 4, 4);
-    const path = pf.computePathOffsetCoordinates({x:0,y:0}, {x:3,y:3}, 0);
-    expect(path.length).toBe(6);
+  const exampleMap: number[][] = [[1, 1, 2, 3, 1, 2, 1, 3, 2, 4, 8, 1, 3, 1, 2, 1]];
+  const pf = new PathFinder(exampleMap, 4, 4);
+  const path = pf.computePathOffsetCoordinates({ x: 0, y: 0 }, { x: 3, y: 3 }, 0);
+  expect(path.length).toBe(6);
 });
 test('noPossiblePath', () => {
-    const exampleMap:number [][] = [[
-        1, 1, 2, 1,
-        1, 2, 3, 3,
-        2, 2, 8, 0,
-        1, 1, 0, 1
-    ]];
-    const pf = new PathFinder(exampleMap, 4, 4);
-    const path = pf.computePathOffsetCoordinates({x:0,y:0}, {x:3,y:3}, 0);
-    expect(path.length).toBe(0);
+  const exampleMap: number[][] = [[1, 1, 2, 1, 1, 2, 3, 3, 2, 2, 8, 0, 1, 1, 0, 1]];
+  const pf = new PathFinder(exampleMap, 4, 4);
+  const path = pf.computePathOffsetCoordinates({ x: 0, y: 0 }, { x: 3, y: 3 }, 0);
+  expect(path.length).toBe(0);
 });
 test('reachableTiles', () => {
-    const exampleMap:number [][] = [[
-        1, 1, 2, 3,
-        1, 2, 1, 3,
-        2, 4, 8, 1,
-        3, 1, 2, 1
-    ]];
-    const pf = new PathFinder(exampleMap, 4, 4);
-    const reachableTiles = pf.reachableTiles({q:0, r:0, s:0}, 2, 0);
-    expect(reachableTiles.length).toBe(7);
+  const exampleMap: number[][] = [[1, 1, 2, 3, 1, 2, 1, 3, 2, 4, 8, 1, 3, 1, 2, 1]];
+  const pf = new PathFinder(exampleMap, 4, 4);
+  const reachableTiles = pf.reachableTiles({ q: 0, r: 0, s: 0 }, 2, 0);
+  expect(reachableTiles.length).toBe(7);
 });
 test('reachableTiles2', () => {
-    const exampleMap:number [][] = [[
-        8, 8, 8, 3,
-        8, 1, 1, 4,
-        8, 8, 1, 1,
-        3, 9, 1, 2
-    ]];
-    const pf = new PathFinder(exampleMap, 4, 4);
-    const reachableTiles = pf.reachableTiles({q:1, r:1, s:-2}, 2, 0);
-    expect(reachableTiles.length).toBe(12);
+  const exampleMap: number[][] = [[8, 8, 8, 3, 8, 1, 1, 4, 8, 8, 1, 1, 3, 9, 1, 2]];
+  const pf = new PathFinder(exampleMap, 4, 4);
+  const reachableTiles = pf.reachableTiles({ q: 1, r: 1, s: -2 }, 2, 0);
+  expect(reachableTiles.length).toBe(12);
 });
 test('reachableTilesLayers', () => {
-    const exampleMap:number [][] = [[
-        1, 2, 0, -1,
-        2, 1, -1, -1,
-        2, 1, -1, -1,
-        1, 1, -1, -1
-    ],[
-        2, 2, 2, -1,
-        1, -1, -1, -1,
-        2, -1, -1, -1,
-        -1, 0, -1, -1
-    ],[
-        1, 1, 1, 1,
-        1, 1, 1, 1,
-        1, 1, 1, 1,
-        1, 1, 1, 1
-    ]];
-    const pf = new PathFinder(exampleMap, 4, 4);
-    const reachableTiles = pf.reachableTiles({q:1, r:1, s:-2}, 2, 2);
-    expect(reachableTiles.length).toBe(15);
+  const exampleMap: number[][] = [
+    [1, 2, 0, -1, 2, 1, -1, -1, 2, 1, -1, -1, 1, 1, -1, -1],
+    [2, 2, 2, -1, 1, -1, -1, -1, 2, -1, -1, -1, -1, 0, -1, -1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  ];
+  const pf = new PathFinder(exampleMap, 4, 4);
+  const reachableTiles = pf.reachableTiles({ q: 1, r: 1, s: -2 }, 2, 2);
+  expect(reachableTiles.length).toBe(15);
 });
 test('wrongLayer', () => {
-    const exampleMap:number [][] = [];
-    exampleMap[0] = Array(16).fill(0);
-    const pf = new PathFinder(exampleMap, 4, 4);
-    const reachableTiles = pf.reachableTiles({q:1, r:1, s:-2}, 2, 10);
-    expect(reachableTiles.length).toBe(0);
+  const exampleMap: number[][] = [];
+  exampleMap[0] = Array(16).fill(0);
+  const pf = new PathFinder(exampleMap, 4, 4);
+  const reachableTiles = pf.reachableTiles({ q: 1, r: 1, s: -2 }, 2, 10);
+  expect(reachableTiles.length).toBe(0);
 });
