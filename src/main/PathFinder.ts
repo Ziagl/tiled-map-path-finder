@@ -36,17 +36,21 @@ export class PathFinder {
     this._hexDefinition = defineHex(this._hexSetting);
   }
 
-  // computes path with lowest costs from start to end
+  /**
+   * computes path with lowest costs from start to end (A* algorithm)
+   * @param start start coordinates
+   * @param end end coordinates
+   * @param layerIndex layer index
+   * @returns path as cube coordinates or empty path if no path was found or layer is out of bounds
+   */
   public computePath(start: CubeCoordinates, end: CubeCoordinates, layerIndex: number): CubeCoordinates[] {
     // early exit if layer is out of bounds
     if (layerIndex < 0 || layerIndex >= this._map_layers) {
       return [];
     }
-
     // initilize grid
     this._grid = new Grid(Tile, rectangle({ width: this._map_columns, height: this._map_rows }));
     let path: CubeCoordinates[] = [];
-
     // initialize AStar
     let openList: Tile[] = [];
     let closedList: Tile[] = [];
@@ -55,7 +59,6 @@ export class PathFinder {
     tile.movementCost = 0;
     tile.estimatedMovementCost = this.calculateDistance(start, end);
     openList.push(tile);
-
     // compute AStar algorithm
     let pathFound = false;
     let loopMax = this.MAXLOOPS;
@@ -74,7 +77,6 @@ export class PathFinder {
         pathFound = false;
         break;
       }
-
       // get neighbors walkable neighbors
       let neighbors = Utils.neighbors(this._grid, tile.coordinates);
       let walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map[layerIndex]!);
@@ -116,7 +118,6 @@ export class PathFinder {
       });
       --loopMax;
     } while (openList.length > 0 && pathFound == false && loopMax > 0);
-
     // reconstruct path
     if (pathFound == true) {
       let current = closedList.pop();
@@ -146,26 +147,28 @@ export class PathFinder {
         --loopMax;
       }
     }
-
     return path.reverse();
   }
 
-  // additional computePath method for offset coordinates
+  /**
+   * same as computePath, but with interface for offset coordinates
+   * @param start start coordinates
+   * @param end end coordinates
+   * @param layerIndex layer index
+   * @returns path as offset coordinates or empty path if no path was found or layer is out of bounds
+   */
   public computePathOffsetCoordinates(
     start: { x: number; y: number },
     end: { x: number; y: number },
     layerIndex: number,
   ): { x: number; y: number }[] {
     let path: { x: number; y: number }[] = [];
-
-    // convert offset coordinates to cube coordinates
+    // convert offset input coordinates to cube coordinates
     const startCube = offsetToCube(this._hexSetting, { col: start.x, row: start.y });
     const endCube = offsetToCube(this._hexSetting, { col: end.x, row: end.y });
-
-    // compute path
+    // call compute path method
     const computedPath = this.computePath(startCube, endCube, layerIndex);
-
-    // convert resultin path back to offset coordinates
+    // convert resulting path back to output offset coordinates
     if (computedPath.length > 0) {
       computedPath.forEach((coord) => {
         const hex = new this._hexDefinition([coord.q, coord.r]);
@@ -173,21 +176,24 @@ export class PathFinder {
         path.push({ x: offset.row, y: offset.col });
       });
     }
-
     return path;
   }
 
-  // returns all tiles that are in range
+  /**
+   * returns all tiles that are in range
+   * @param start start coordinates
+   * @param maxcost maximum cost
+   * @param layerIndex layer index
+   * @returns reachable tiles as cube coordinates or empty path if layer is out of bounds
+   */
   public reachableTiles(start: CubeCoordinates, maxcost: number, layerIndex: number): CubeCoordinates[] {
     // early exit if layer is out of bounds
     if (layerIndex < 0 || layerIndex >= this._map_layers) {
       return [];
     }
-
     // initilize grid
     this._grid = new Grid(Tile, rectangle({ width: this._map_columns, height: this._map_rows }));
     let reachableTiles: CubeCoordinates[] = [];
-
     // initialize
     let openList: Tile[] = [];
     let closedList: Tile[] = [];
@@ -195,7 +201,6 @@ export class PathFinder {
     tile.coordinates = start;
     tile.movementCost = 0;
     openList.push(tile);
-
     // compute
     let loopMax = this.MAXLOOPS;
     do {
@@ -235,16 +240,17 @@ export class PathFinder {
       });
       --loopMax;
     } while (openList.length > 0 && loopMax > 0);
-
     // fill reachable tiles
     closedList.forEach((tile) => {
       reachableTiles.push(tile.coordinates);
     });
-
     return reachableTiles;
   }
 
-  // print map structured (one row as one line)
+  /**
+   * print map structured (one row as one line)
+   * @returns map as string
+   */
   public print(): string {
     let response: string = '';
     for (let i = 0; i < this._map_columns; ++i) {
@@ -257,7 +263,10 @@ export class PathFinder {
     return response;
   }
 
-  // print map unstructured
+  /**
+   * print map unstructured
+   * @returns map as string
+   **/
   public print_unstructured(): string {
     return this._map.flat().join(' ');
   }
