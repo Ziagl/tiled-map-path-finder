@@ -1,6 +1,6 @@
 {
   "name": "@ziagl/tiled-map-path-finder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A path finder library for 2 dimensional maps.",
   "author": "Werner Ziegelwanger (ziagl)",
   "license": "GNU LESSER GENERAL PUBLIC LICENSE",
@@ -42,6 +42,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@ziagl/tiled-map-utils": "^0.0.3",
     "honeycomb-grid": "^4.1.5"
   }
 }

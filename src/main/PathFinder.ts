@@ -9,8 +9,8 @@ import {
   offsetToCube,
   rectangle,
 } from 'honeycomb-grid';
-import { Utils } from './models/Utils';
 import { Tile } from './models/Tile';
+import { BaseTile, Utils } from '@ziagl/tiled-map-utils';
 
 export class PathFinder {
   private readonly MAXLOOPS = 10000;
@@ -18,7 +18,7 @@ export class PathFinder {
   private _map_columns: number = 0;
   private _map_rows: number = 0;
   private _map_layers: number = 0;
-  private _grid: Grid<Tile>;
+  private _grid: Grid<BaseTile>;
   private _hexSetting;
   private _hexDefinition;
 
@@ -31,7 +31,7 @@ export class PathFinder {
     this._map_layers = map.length;
 
     // initilize grid and definition to convert offset -> cube coordinates
-    this._grid = new Grid(Tile, rectangle({ width: this._map_columns, height: this._map_rows }));
+    this._grid = new Grid<BaseTile>(Tile, rectangle({ width: this._map_columns, height: this._map_rows }));
     this._hexSetting = { offset: -1 as HexOffset, orientation: Orientation.POINTY };
     this._hexDefinition = defineHex(this._hexSetting);
   }
@@ -49,7 +49,7 @@ export class PathFinder {
       return [];
     }
     // initilize grid
-    this._grid = new Grid(Tile, rectangle({ width: this._map_columns, height: this._map_rows }));
+    this._grid = new Grid<BaseTile>(Tile, rectangle({ width: this._map_columns, height: this._map_rows }));
     let path: CubeCoordinates[] = [];
     // initialize AStar
     let openList: Tile[] = [];
@@ -79,7 +79,7 @@ export class PathFinder {
       }
       // get neighbors walkable neighbors
       let neighbors = Utils.neighbors(this._grid, tile.coordinates);
-      let walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map[layerIndex]!);
+      let walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map[layerIndex]!) as Tile[];
       // for every walkable neighbor
       walkableNeighbors.forEach((neighbor) => {
         // if neighbor is in closed list, skip it
@@ -131,7 +131,7 @@ export class PathFinder {
           current = undefined;
         } else {
           const neighbors = Utils.neighbors(this._grid, current.coordinates);
-          const walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map[layerIndex]!);
+          const walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map[layerIndex]!) as Tile[];
           Utils.shuffle(walkableNeighbors);
           for (const neighbor of walkableNeighbors) {
             const nextTile = closedList.find(
@@ -192,7 +192,7 @@ export class PathFinder {
       return [];
     }
     // initilize grid
-    this._grid = new Grid(Tile, rectangle({ width: this._map_columns, height: this._map_rows }));
+    this._grid = new Grid<BaseTile>(Tile, rectangle({ width: this._map_columns, height: this._map_rows }));
     let reachableTiles: CubeCoordinates[] = [];
     // initialize
     let openList: Tile[] = [];
@@ -214,7 +214,7 @@ export class PathFinder {
       }
       // get neighbors walkable neighbors
       let neighbors = Utils.neighbors(this._grid, tile.coordinates);
-      let walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map[layerIndex]!);
+      let walkableNeighbors = Utils.walkableNeighbors(neighbors, this._map[layerIndex]!) as Tile[];
       // for every walkable neighbor
       walkableNeighbors.forEach((neighbor) => {
         // if neighbor is in closed list, skip it
@@ -273,7 +273,7 @@ export class PathFinder {
 
   // calculates Manhattan distance
   private calculateDistance(start: CubeCoordinates, end: CubeCoordinates): number {
-    const lineBetween = line<Tile>({ start: [start.q, start.r], stop: [end.q, end.r] });
+    const lineBetween = line<BaseTile>({ start: [start.q, start.r], stop: [end.q, end.r] });
     return this._grid.traverse(lineBetween).size;
   }
 
