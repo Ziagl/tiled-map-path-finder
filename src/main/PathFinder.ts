@@ -171,9 +171,7 @@ export class PathFinder {
     // convert resulting path back to output offset coordinates
     if (computedPath.length > 0) {
       computedPath.forEach((coord) => {
-        const hex = new this._hexDefinition([coord.q, coord.r]);
-        const offset = hexToOffset(hex);
-        path.push({ x: offset.row, y: offset.col });
+        path.push(this.cubeToOffset(coord));
       });
     }
     return path;
@@ -245,6 +243,27 @@ export class PathFinder {
       reachableTiles.push(tile.coordinates);
     });
     return reachableTiles;
+  }
+
+  /**
+   * Returns coordinates of all neighbors of a given base tile. 
+   * Minimum 2 (map edges), maximum 6.
+   * @param base coordinates of a tile on this map
+   * @returns list of cubecoordinates of all neighbors
+   */
+  public neighborTiles(base: CubeCoordinates): CubeCoordinates[] {
+    return Utils.neighbors(this._grid, base).map((tile) => tile.coordinates);
+  }
+
+  /**
+   * Converts cube coordinates to offset coordinates
+   * @param coordinate cube coordinates
+   * @returns offset coordinates
+   */
+  public cubeToOffset(coordinate: CubeCoordinates): { x: number; y: number } {
+    const hex = new this._hexDefinition([coordinate.q, coordinate.r]);
+    const offset = hexToOffset(hex);
+    return { x: offset.col, y: offset.row };
   }
 
   /**

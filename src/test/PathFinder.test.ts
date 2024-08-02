@@ -54,3 +54,38 @@ test('wrongLayer', () => {
   const reachableTiles = pf.reachableTiles({ q: 1, r: 1, s: -2 }, 2, 10);
   expect(reachableTiles.length).toBe(0);
 });
+test('neighborTilesMinNeighbors', () => {
+  const exampleMap: number[][] = [];
+  exampleMap[0] = Array(16).fill(0);
+  const pf = new PathFinder(exampleMap, 4, 4);
+  const neighbors = pf.neighborTiles({ q: 0, r: 0, s: 0 });
+  expect(neighbors.length).toBe(2);
+  expect(neighbors[0]!.q).toBe(1); // 1, 0, -1
+  expect(neighbors[1]!.q).toBe(0); // 0, 1, -1
+});
+test('neighborTilesMaxNeighbors', () => {
+  const exampleMap: number[][] = [];
+  exampleMap[0] = Array(16).fill(0);
+  const pf = new PathFinder(exampleMap, 4, 4);
+  const neighbors = pf.neighborTiles({ q: 1, r: 1, s: -2 });
+  expect(neighbors[0]!.q).toBe(2); // 2, 0, -2
+  expect(neighbors[1]!.q).toBe(2); // 2, 1, -3
+  expect(neighbors[2]!.q).toBe(1); // 1, 2, -3
+  expect(neighbors[3]!.q).toBe(0); // 0, 2, -2
+  expect(neighbors[4]!.q).toBe(0); // 0, 1, -1
+  expect(neighbors[5]!.q).toBe(1); // 1, 0, -1
+});
+test('cubeToOffset', () => {
+  const exampleMap: number[][] = [];
+  exampleMap[0] = Array(16).fill(0);
+  const pf = new PathFinder(exampleMap, 4, 4);
+  let offsetCoords = pf.cubeToOffset({ q: 0, r: 0, s: 0 });
+  expect(offsetCoords.x).toBe(0);
+  expect(offsetCoords.y).toBe(0);
+  offsetCoords = pf.cubeToOffset({ q: 1, r: 1, s: -2 });
+  expect(offsetCoords.x).toBe(1);
+  expect(offsetCoords.y).toBe(1);
+  offsetCoords = pf.cubeToOffset({ q: 2, r: 2, s: -4 });
+  expect(offsetCoords.x).toBe(3);
+  expect(offsetCoords.y).toBe(2);
+});
