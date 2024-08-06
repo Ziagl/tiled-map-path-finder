@@ -89,3 +89,20 @@ test('cubeToOffset', () => {
   expect(offsetCoords.x).toBe(3);
   expect(offsetCoords.y).toBe(2);
 });
+test('offsetToCube', () => {
+  const exampleMap: number[][] = [];
+  exampleMap[0] = Array(16).fill(0);
+  const pf = new PathFinder(exampleMap, 4, 4);
+  let cubeCoords = pf.offsetToCube({ x: 0, y: 0 });
+  expect(cubeCoords.q).toBe(0);
+  expect(cubeCoords.r).toBe(0);
+  expect(cubeCoords.s).toBe(-0);
+  cubeCoords = pf.offsetToCube({ x: 1, y: 1 });
+  expect(cubeCoords.q).toBe(1);
+  expect(cubeCoords.r).toBe(1);
+  expect(cubeCoords.s).toBe(-2);
+  cubeCoords = pf.offsetToCube({ x: 3, y: 2 });
+  expect(cubeCoords.q).toBe(2);
+  expect(cubeCoords.r).toBe(2);
+  expect(cubeCoords.s).toBe(-4);
+});

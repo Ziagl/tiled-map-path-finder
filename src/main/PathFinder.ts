@@ -257,13 +257,22 @@ export class PathFinder {
 
   /**
    * Converts cube coordinates to offset coordinates
-   * @param coordinate cube coordinates
-   * @returns offset coordinates
+   * @param coordinate cube coordinates (q, r, s)
+   * @returns offset coordinates (x, y)
    */
   public cubeToOffset(coordinate: CubeCoordinates): { x: number; y: number } {
     const hex = new this._hexDefinition([coordinate.q, coordinate.r]);
     const offset = hexToOffset(hex);
     return { x: offset.col, y: offset.row };
+  }
+
+  /**
+   * Converts offset coordinates to cube coordinates
+   * @param coordinate offset coordinates (x, y)
+   * @returns cube coordinates (q, r, s)
+   */
+  public offsetToCube(coordinate: { x: number; y: number }): CubeCoordinates {
+    return offsetToCube(this._hexSetting, { col: coordinate.x, row: coordinate.y });
   }
 
   /**
